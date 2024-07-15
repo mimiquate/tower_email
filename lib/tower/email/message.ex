@@ -1,8 +1,8 @@
 defmodule Tower.Email.Message do
   def new(kind, reason, stacktrace \\ nil) do
     Swoosh.Email.new(
-      to: "TBD",
-      from: "TBD",
+      to: {"TBD", "tbd@example.com"},
+      from: {"TBD", "tbd@example.com"},
       subject: "#{kind}: #{reason}",
       html_body: html_body(kind, reason, stacktrace),
       text_body: text_body(kind, reason, stacktrace)
@@ -40,15 +40,10 @@ defmodule Tower.Email.Message do
     :defp,
     :text_body,
     """
-      Kind: <%= kind %>
-      Reason: <%= reason %>
-
+      <%= kind %>
+      <%= reason %>
       <%= if stacktrace do %>
-        Stacktrace:
-
-        <%= for entry <- stacktrace do %>
-          <%= Exception.format_stacktrace_entry(entry) %>
-        <% end %>
+        <%= Exception.format_stacktrace(stacktrace) %>
       <% end %>
     """,
     [:kind, :reason, :stacktrace]
