@@ -23,6 +23,8 @@ defmodule TowerEmail.MixProject do
     [
       {:tower, github: "mimiquate/tower"},
       {:swoosh, "~> 1.16"},
+
+      # Optional
       {:hackney, "~> 1.20", optional: true}
     ]
   end
