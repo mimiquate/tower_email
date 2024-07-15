@@ -29,6 +29,6 @@ defmodule Tower.Email.Reporter do
 
   defp send_email(subject, body) do
     Tower.Email.Message.new(subject, body, body)
-    |> Tower.Email.Mailer.deliver_later()
+    |> Tower.Email.Mailer.deliver()
   end
 end

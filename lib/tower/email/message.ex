@@ -1,6 +1,6 @@
 defmodule Tower.Email.Message do
   def new(subject, html_body, text_body) do
-    Bamboo.Email.new_email(
+    Swoosh.Email.new(
       to: "to",
       from: "from",
       subject: subject,
