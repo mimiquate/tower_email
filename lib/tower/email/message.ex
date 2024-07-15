@@ -1,5 +1,20 @@
 defmodule Tower.Email.Message do
-  @html_template """
+  def new(kind, reason, stacktrace \\ nil) do
+    Swoosh.Email.new(
+      to: "TBD",
+      from: "TBD",
+      subject: "#{kind}: #{reason}",
+      html_body: html_body(kind, reason, stacktrace),
+      text_body: text_body(kind, reason, stacktrace)
+    )
+  end
+
+  require EEx
+
+  EEx.function_from_string(
+    :defp,
+    :html_body,
+    """
     <h2>
       <%= kind %>
     </h2>
@@ -17,30 +32,25 @@ defmodule Tower.Email.Message do
         <% end %>
       </code>
     <% end %>
-  """
+    """,
+    [:kind, :reason, :stacktrace]
+  )
 
-  @text_template """
-    Kind: <%= kind %>
-    Reason: <%= reason %>
+  EEx.function_from_string(
+    :defp,
+    :text_body,
+    """
+      Kind: <%= kind %>
+      Reason: <%= reason %>
 
-    <%= if stacktrace do %>
-      Stacktrace:
+      <%= if stacktrace do %>
+        Stacktrace:
 
-      <%= for entry <- stacktrace do %>
-        <%= Exception.format_stacktrace_entry(entry) %>
+        <%= for entry <- stacktrace do %>
+          <%= Exception.format_stacktrace_entry(entry) %>
+        <% end %>
       <% end %>
-    <% end %>
-  """
-
-  def new(kind, reason, stacktrace \\ nil) do
-    Swoosh.Email.new(
-      to: "TBD",
-      from: "TBD",
-      subject: "#{kind}: #{reason}",
-      html_body:
-        EEx.eval_string(@html_template, kind: kind, reason: reason, stacktrace: stacktrace),
-      text_body:
-        EEx.eval_string(@text_template, kind: kind, reason: reason, stacktrace: stacktrace)
-    )
-  end
+    """,
+    [:kind, :reason, :stacktrace]
+  )
 end
