@@ -1,6 +1,16 @@
 defmodule Tower.Email.Reporter do
   @behaviour Tower.Reporter
 
+  @html_template """
+    <h1><%= kind %></h1>
+    <h2><%= reason %></h2>
+  """
+
+  @text_template """
+    Kind: <%= kind %>
+    Reason: <%= reason %>
+  """
+
   @impl true
   def report_exception(exception, _stacktrace, _metadata \\ %{}) when is_exception(exception) do
     send_email(exception.__struct__, Exception.message(exception))
@@ -8,12 +18,12 @@ defmodule Tower.Email.Reporter do
 
   @impl true
   def report_throw(reason, _stacktrace, _metadata \\ %{}) do
-    send_email("Uncaught throw: #{reason}", "")
+    send_email("Uncaught throw", reason)
   end
 
   @impl true
   def report_exit(reason, _stacktrace, _metadata \\ %{}) do
-    send_email("EXIT: #{reason}", "")
+    send_email("EXIT", reason)
   end
 
   @impl true
@@ -27,9 +37,13 @@ defmodule Tower.Email.Reporter do
     send_email("[#{level}] #{inspect(message)}", "")
   end
 
-  defp send_email(subject, body) do
+  defp send_email(kind, reason) do
     {:ok, _} =
-      Tower.Email.Message.new(subject, body, body)
+      Tower.Email.Message.new(
+        "#{kind}: #{reason}",
+        EEx.eval_string(@html_template, kind: kind, reason: reason),
+        EEx.eval_string(@text_template, kind: kind, reason: reason)
+      )
       |> Tower.Email.Mailer.deliver()
 
     :ok
