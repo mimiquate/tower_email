@@ -1,5 +1,4 @@
 defmodule Tower.Email.Message do
-
   @html_template """
     <h2>
       <%= kind %>
@@ -37,8 +36,10 @@ defmodule Tower.Email.Message do
       to: "TBD",
       from: "TBD",
       subject: "#{kind}: #{reason}",
-      html_body: EEx.eval_string(@html_template, kind: kind, reason: reason, stacktrace: stacktrace),
-      text_body: EEx.eval_string(@text_template, kind: kind, reason: reason, stacktrace: stacktrace)
+      html_body:
+        EEx.eval_string(@html_template, kind: kind, reason: reason, stacktrace: stacktrace),
+      text_body:
+        EEx.eval_string(@text_template, kind: kind, reason: reason, stacktrace: stacktrace)
     )
   end
 end
