@@ -11,6 +11,7 @@ defmodule Tower.Email.Message do
     <%= if stacktrace do %>
       <code>
         <%= for entry <- stacktrace do %>
+          &nbsp;
           <%= Exception.format_stacktrace_entry(entry) %>
           <br />
         <% end %>

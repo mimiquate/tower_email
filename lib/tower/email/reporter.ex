@@ -8,13 +8,13 @@ defmodule Tower.Email.Reporter do
   end
 
   @impl true
-  def report_throw(reason, _stacktrace, _metadata \\ %{}) do
-    send_email("Uncaught throw", reason)
+  def report_throw(reason, stacktrace, _metadata \\ %{}) do
+    send_email("Uncaught throw", reason, stacktrace)
   end
 
   @impl true
-  def report_exit(reason, _stacktrace, _metadata \\ %{}) do
-    send_email("EXIT", reason)
+  def report_exit(reason, stacktrace, _metadata \\ %{}) do
+    send_email("Exit", reason, stacktrace)
   end
 
   @impl true
