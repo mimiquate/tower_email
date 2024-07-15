@@ -1,8 +1,8 @@
 defmodule Tower.Email.Message do
   def new(kind, reason, stacktrace \\ nil) do
     Swoosh.Email.new(
-      to: {"TBD", "tbd@example.com"},
-      from: {"TBD", "tbd@example.com"},
+      to: Application.fetch_env!(:tower_email, :to),
+      from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
       subject: "#{kind}: #{reason}",
       html_body: html_body(kind, reason, stacktrace),
       text_body: text_body(kind, reason, stacktrace)
