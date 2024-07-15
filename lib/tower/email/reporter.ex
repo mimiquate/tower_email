@@ -28,7 +28,10 @@ defmodule Tower.Email.Reporter do
   end
 
   defp send_email(subject, body) do
-    Tower.Email.Message.new(subject, body, body)
-    |> Tower.Email.Mailer.deliver()
+    {:ok, _} =
+      Tower.Email.Message.new(subject, body, body)
+      |> Tower.Email.Mailer.deliver()
+
+    :ok
   end
 end
