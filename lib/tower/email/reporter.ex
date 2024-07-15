@@ -4,7 +4,7 @@ defmodule Tower.Email.Reporter do
   @impl true
   def report_exception(exception, stacktrace, _metadata \\ %{})
       when is_exception(exception) and is_list(stacktrace) do
-    send_email(exception.__struct__, Exception.message(exception), stacktrace)
+    send_email(inspect(exception.__struct__), Exception.message(exception), stacktrace)
   end
 
   @impl true
