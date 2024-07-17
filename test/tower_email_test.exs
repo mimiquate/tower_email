@@ -22,7 +22,10 @@ defmodule TowerEmailTest do
     # TODO: Support waiting on assert_email_sent with a timeout
     # Swoosh.TestAssertions.assert_email_sent(subject: "ArithmeticError: bad argument in arithmetic expression")
     assert_receive(
-      {:email, %{subject: "ArithmeticError: bad argument in arithmetic expression"}},
+      {
+        :email,
+        %{subject: "[tower_email][test] ArithmeticError: bad argument in arithmetic expression"}
+      },
       1_000
     )
   end
