@@ -3,10 +3,18 @@ defmodule Tower.Email.Message do
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
       from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
-      subject: "#{kind}: #{reason}",
+      subject: "[#{app_name()}][#{environment()}] #{kind}: #{reason}",
       html_body: html_body(kind, reason, stacktrace),
       text_body: text_body(kind, reason, stacktrace)
     )
+  end
+
+  defp app_name do
+    Application.fetch_env!(:tower_email, :otp_app)
+  end
+
+  defp environment do
+    Application.fetch_env!(:tower_email, :environment)
   end
 
   require EEx
