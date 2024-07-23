@@ -1,12 +1,18 @@
 defmodule Tower.Email.Message do
+  @subject_max_length 120
+
   def new(kind, reason, stacktrace \\ nil) do
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
       from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
-      subject: "[#{app_name()}][#{environment()}] #{kind}: #{reason}",
+      subject: truncate(subject(kind, reason), @subject_max_length),
       html_body: html_body(kind, reason, stacktrace),
       text_body: text_body(kind, reason, stacktrace)
     )
+  end
+
+  defp subject(kind, reason) do
+    "[#{app_name()}][#{environment()}] #{kind}: #{reason}"
   end
 
   defp app_name do
@@ -15,6 +21,15 @@ defmodule Tower.Email.Message do
 
   defp environment do
     Application.fetch_env!(:tower_email, :environment)
+  end
+
+  defp truncate(text, max_length) do
+    if String.length(text) <= max_length do
+      text
+    else
+      suffix = "..."
+      "#{String.slice(text, 0, max_length - String.length(suffix))}#{suffix}"
+    end
   end
 
   require EEx
