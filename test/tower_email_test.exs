@@ -33,7 +33,7 @@ defmodule TowerEmailTest do
   @tag capture_log: true
   test "reports long match error" do
     in_unlinked_process(fn ->
-      %{eleven: "eleven"} = %{
+      [eleven: "eleven"] = [
         one: "one",
         two: "two",
         three: "three",
@@ -44,7 +44,7 @@ defmodule TowerEmailTest do
         eight: "eight",
         nine: "nine",
         ten: "ten"
-      }
+      ]
     end)
 
     # TODO: Support waiting on assert_email_sent with a timeout
@@ -54,7 +54,7 @@ defmodule TowerEmailTest do
         :email,
         %{
           subject:
-            ~s([tower_email][test] MatchError: no match of right hand side value: %{one: "one", two: "two", three: "three", four: "f...)
+            ~s([tower_email][test] MatchError: no match of right hand side value: [one: "one", two: "two", three: "three", four: "fo...)
         }
       },
       1_000
