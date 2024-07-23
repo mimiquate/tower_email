@@ -18,7 +18,7 @@ jobs:
             blend: swoosh_1_15
           - elixir: '1.15'
             erlang: '25.3.2.13'
-            blend: swoosh_1_15
+            blend: swoosh_1_14
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
