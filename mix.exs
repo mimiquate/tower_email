@@ -22,10 +22,13 @@ defmodule TowerEmail.MixProject do
   defp deps do
     [
       {:tower, github: "mimiquate/tower"},
-      {:swoosh, "~> 1.16"},
+      {:swoosh, "~> 1.15"},
 
       # Optional
-      {:hackney, "~> 1.20", optional: true}
+      {:hackney, "~> 1.20", optional: true},
+
+      # Dev
+      {:blend, "~> 0.3.0", only: :dev}
     ]
   end
 end
