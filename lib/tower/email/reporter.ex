@@ -1,5 +1,6 @@
 defmodule Tower.Email.Reporter do
   @behaviour Tower.Reporter
+
   @default_level :error
 
   @impl true
