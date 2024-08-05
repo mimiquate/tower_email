@@ -1,13 +1,13 @@
 defmodule Tower.Email.Message do
   @subject_max_length 120
 
-  def new(kind, reason, stacktrace \\ nil) do
+  def new(id, kind, reason, stacktrace \\ nil) do
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
       from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
       subject: truncate(subject(kind, reason), @subject_max_length),
-      html_body: html_body(kind, reason, stacktrace),
-      text_body: text_body(kind, reason, stacktrace)
+      html_body: html_body(id, kind, reason, stacktrace),
+      text_body: text_body(id, kind, reason, stacktrace)
     )
   end
 
@@ -55,8 +55,12 @@ defmodule Tower.Email.Message do
         <% end %>
       </code>
     <% end %>
+
+    <p>
+      ID: <%= id %>
+    </p>
     """,
-    [:kind, :reason, :stacktrace]
+    [:id, :kind, :reason, :stacktrace]
   )
 
   EEx.function_from_string(
@@ -68,7 +72,8 @@ defmodule Tower.Email.Message do
       <%= if stacktrace do %>
         <%= Exception.format_stacktrace(stacktrace) %>
       <% end %>
+      id: <%= id %>
     """,
-    [:kind, :reason, :stacktrace]
+    [:id, :kind, :reason, :stacktrace]
   )
 end
