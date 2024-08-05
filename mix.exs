@@ -21,7 +21,7 @@ defmodule TowerEmail.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:tower, github: "mimiquate/tower", branch: "level"},
+      {:tower, github: "mimiquate/tower"},
       {:swoosh, "~> 1.14"},
 
       # Optional
