@@ -24,7 +24,11 @@ defmodule TowerEmailTest do
     assert_receive(
       {
         :email,
-        %{subject: "[tower_email][test] ArithmeticError: bad argument in arithmetic expression"}
+        %{
+          subject:
+            "[tower_email][test] ArithmeticError: bad argument in arithmetic expression (" <>
+              <<_id::binary-size(36)>> <> ")"
+        }
       },
       1_000
     )
@@ -54,7 +58,8 @@ defmodule TowerEmailTest do
         :email,
         %{
           subject:
-            ~s([tower_email][test] MatchError: no match of right hand side value: [one: "one", two: "two", three: "three", four: "fo...)
+            ~s{[tower_email][test] MatchError: no match of right hand side value: [one: "one", two: "two", three... (} <>
+              <<_id::binary-size(36)>> <> ")"
         }
       },
       1_000

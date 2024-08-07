@@ -1,18 +1,16 @@
 defmodule Tower.Email.Message do
-  @subject_max_length 120
-
   def new(id, kind, reason, stacktrace \\ nil) do
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
       from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
-      subject: truncate(subject(kind, reason), @subject_max_length),
+      subject: subject(id, kind, reason),
       html_body: html_body(id, kind, reason, stacktrace),
       text_body: text_body(id, kind, reason, stacktrace)
     )
   end
 
-  defp subject(kind, reason) do
-    "[#{app_name()}][#{environment()}] #{kind}: #{reason}"
+  defp subject(id, kind, reason) do
+    truncate("[#{app_name()}][#{environment()}] #{kind}: #{reason}", 100) <> " (#{id})"
   end
 
   defp app_name do
