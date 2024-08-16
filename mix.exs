@@ -32,7 +32,7 @@ defmodule TowerEmail.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:tower, "~> 0.2.0"},
+      {:tower, "~> 0.4.0"},
       {:swoosh, "~> 1.14"},
 
       # Optional
