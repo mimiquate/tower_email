@@ -3,7 +3,7 @@ defmodule TowerEmail.MixProject do
 
   @description "Email reporter for Tower"
   @source_url "https://github.com/mimiquate/tower_email"
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
