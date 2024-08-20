@@ -1,13 +1,18 @@
 # TowerEmail
 
-**TODO: Add description**
+[![ci](https://github.com/mimiquate/tower_email/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mimiquate/tower_email/actions?query=branch%3Amain)
+[![Hex.pm](https://img.shields.io/hexpm/v/tower_email.svg)](https://hex.pm/packages/tower_email)
+[![Docs](https://img.shields.io/badge/docs-gray.svg)](https://hexdocs.pm/tower_email)
+
+Simple send-me-an-email reporter for [Tower](https://github.com/mimiquate/tower) error handler.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `tower_email` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `tower_email` to your list of dependencies in `mix.exs`:
 
 ```elixir
+# mix.exs
+
 def deps do
   [
     {:tower_email, "~> 0.3.0"}
@@ -15,9 +20,59 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/tower_email>.
+## Usage
+
+First, `Tower` error handler must be attached.
+
+```elixir
+# lib/<your_app>/application.ex
+
+defmodule YourApp.Application do
+  def start(_type, _args) do
+    Tower.attach()
+
+    # rest of your code
+  end
+```
+
+Then you register the reporter with Tower.
+
+```elixir
+# config/config.exs
+
+config(
+  :tower,
+  :reporters,
+  [
+    # along any other possible reporters
+    Tower.Email.Reporter
+  ]
+)
+```
+
+And make any additional configurations specific to this reporter.
+
+```elixir
+# config/runtime.exs
+
+config :tower_email,
+  otp_app: :your_app,
+  from: {"Tower", "tower@<your_domain>"},
+  to: "<recipient email address>",
+  environment: System.get_env("DEPLOYMENT_ENV", to_string(config_env()))
+
+# Configuring swoosh adapter in `Tower.Email.Mailer`:
+
+# Example for local development
+# config :tower_email, Tower.Email.Mailer, adapter: Swoosh.Adapters.Local
+
+# Example for production
+config :tower_email, Tower.Email.Mailer,
+  adapter: Swoosh.Adapters.Postmark,
+  api_key: System.fetch_env!("POSTMARK_API_KEY")
+```
+
+Configuring `Tower.Email.Mailer` is analogous on how to configure any `Swoosh.Mailer` https://hexdocs.pm/swoosh/Swoosh.Mailer.html.
 
 ## License
 
