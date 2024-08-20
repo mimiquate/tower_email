@@ -10,7 +10,7 @@ by adding `tower_email` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:tower_email, "~> 0.2.0"}
+    {:tower_email, "~> 0.3.0"}
   ]
 end
 ```
