@@ -1,4 +1,8 @@
 defmodule TowerEmail.Reporter do
+  @moduledoc """
+  The reporter module that needs to be added to the list of Tower reporters.
+  """
+
   @behaviour Tower.Reporter
 
   @default_level :error

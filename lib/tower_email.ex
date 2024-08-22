@@ -1,5 +1,5 @@
 defmodule TowerEmail do
   @moduledoc """
-  Documentation for `TowerEmail`.
+  Simple send-me-an-email reporter for `Tower` error handler.
   """
 end

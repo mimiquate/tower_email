@@ -1,4 +1,6 @@
 defmodule TowerEmail.Message do
+  @moduledoc false
+
   def new(id, kind, reason, stacktrace \\ nil) do
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
