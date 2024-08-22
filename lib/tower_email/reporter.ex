@@ -1,4 +1,4 @@
-defmodule Tower.Email.Reporter do
+defmodule TowerEmail.Reporter do
   @behaviour Tower.Reporter
 
   @default_level :error
@@ -40,8 +40,8 @@ defmodule Tower.Email.Reporter do
 
   defp send_email(id, kind, reason, stacktrace \\ nil) do
     {:ok, _} =
-      Tower.Email.Message.new(id, kind, reason, stacktrace)
-      |> Tower.Email.Mailer.deliver()
+      TowerEmail.Message.new(id, kind, reason, stacktrace)
+      |> TowerEmail.Mailer.deliver()
 
     :ok
   end

@@ -1,3 +1,3 @@
-defmodule Tower.Email.Mailer do
+defmodule TowerEmail.Mailer do
   use Swoosh.Mailer, otp_app: :tower_email
 end

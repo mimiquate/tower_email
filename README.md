@@ -45,7 +45,7 @@ config(
   :reporters,
   [
     # along any other possible reporters
-    Tower.Email.Reporter
+    TowerEmail.Reporter
   ]
 )
 ```
@@ -61,18 +61,18 @@ config :tower_email,
   to: "<recipient email address>",
   environment: System.get_env("DEPLOYMENT_ENV", to_string(config_env()))
 
-# Configuring swoosh adapter in `Tower.Email.Mailer`:
+# Configuring swoosh adapter in `TowerEmail.Mailer`:
 
 # Example for local development
-# config :tower_email, Tower.Email.Mailer, adapter: Swoosh.Adapters.Local
+# config :tower_email, TowerEmail.Mailer, adapter: Swoosh.Adapters.Local
 
 # Example for production
-config :tower_email, Tower.Email.Mailer,
+config :tower_email, TowerEmail.Mailer,
   adapter: Swoosh.Adapters.Postmark,
   api_key: System.fetch_env!("POSTMARK_API_KEY")
 ```
 
-Configuring `Tower.Email.Mailer` is analogous on how to configure any `Swoosh.Mailer` https://hexdocs.pm/swoosh/Swoosh.Mailer.html.
+Configuring `TowerEmail.Mailer` is analogous on how to configure any `Swoosh.Mailer` https://hexdocs.pm/swoosh/Swoosh.Mailer.html.
 
 ## License
 

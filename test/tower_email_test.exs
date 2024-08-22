@@ -3,7 +3,7 @@ defmodule TowerEmailTest do
   doctest TowerEmail
 
   setup do
-    Application.put_env(:tower, :reporters, [Tower.Email.Reporter])
+    Application.put_env(:tower, :reporters, [TowerEmail.Reporter])
     Application.put_env(:tower_email, :to, "to@example.com")
 
     Tower.attach()
