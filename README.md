@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/mimiquate/tower_email/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mimiquate/tower_email/actions?query=branch%3Amain)
 [![Hex.pm](https://img.shields.io/hexpm/v/tower_email.svg)](https://hex.pm/packages/tower_email)
-[![Docs](https://img.shields.io/badge/docs-gray.svg)](https://hexdocs.pm/tower_email)
+[![Documentation](https://img.shields.io/badge/Documentation-purple.svg)](https://hexdocs.pm/tower_email)
 
 Simple send-me-an-email reporter for [Tower](https://github.com/mimiquate/tower) error handler.
 
