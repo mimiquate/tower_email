@@ -1,7 +1,7 @@
 defmodule TowerEmail.MixProject do
   use Mix.Project
 
-  @description "Email reporter for Tower error handler"
+  @description "Error tracking and reporting to your e-mail inbox"
   @source_url "https://github.com/mimiquate/tower_email"
   @version "0.4.0"
 

@@ -4,6 +4,8 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/tower_email.svg)](https://hex.pm/packages/tower_email)
 [![Documentation](https://img.shields.io/badge/Documentation-purple.svg)](https://hexdocs.pm/tower_email)
 
+Error tracking and reporting to your e-mail inbox.
+
 Simple send-me-an-email reporter for [Tower](https://github.com/mimiquate/tower) error handler.
 
 ## Installation
