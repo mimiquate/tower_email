@@ -2,6 +2,8 @@ defmodule TowerEmailTest do
   use ExUnit.Case
   doctest TowerEmail
 
+  import ExUnit.CaptureLog, only: [capture_log: 1]
+
   setup do
     Application.put_env(:tower, :reporters, [TowerEmail.Reporter])
     Application.put_env(:tower_email, :to, "to@example.com")
@@ -13,10 +15,11 @@ defmodule TowerEmailTest do
     end)
   end
 
-  @tag capture_log: true
   test "reports arithmetic error" do
-    in_unlinked_process(fn ->
-      1 / 0
+    capture_log(fn ->
+      in_unlinked_process(fn ->
+        1 / 0
+      end)
     end)
 
     # TODO: Support waiting on assert_email_sent with a timeout
@@ -34,21 +37,22 @@ defmodule TowerEmailTest do
     )
   end
 
-  @tag capture_log: true
   test "reports long match error" do
-    in_unlinked_process(fn ->
-      [eleven: "eleven"] = [
-        one: "one",
-        two: "two",
-        three: "three",
-        four: "four",
-        five: "five",
-        six: "six",
-        seven: "seven",
-        eight: "eight",
-        nine: "nine",
-        ten: "ten"
-      ]
+    capture_log(fn ->
+      in_unlinked_process(fn ->
+        [eleven: "eleven"] = [
+          one: "one",
+          two: "two",
+          three: "three",
+          four: "four",
+          five: "five",
+          six: "six",
+          seven: "seven",
+          eight: "eight",
+          nine: "nine",
+          ten: "ten"
+        ]
+      end)
     end)
 
     # TODO: Support waiting on assert_email_sent with a timeout
