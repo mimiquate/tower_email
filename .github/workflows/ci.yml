@@ -15,6 +15,9 @@ jobs:
             lint: true
           - elixir: '1.16'
             erlang: '26.2.5'
+            blend: swoosh_1_16
+          - elixir: '1.15'
+            erlang: '25.3.2.13'
             blend: swoosh_1_15
           - elixir: '1.15'
             erlang: '25.3.2.13'
