@@ -55,23 +55,29 @@ config(
 And make any additional configurations specific to this reporter.
 
 ```elixir
-# config/runtime.exs
+# Build-time config (config/{config, dev, test, prod}.exs)
 
 config :tower_email,
   otp_app: :your_app,
   from: {"Tower", "tower@<your_domain>"},
-  to: "<recipient email address>",
+  to: "<recipient email address>"
+
+# config/runtime.exs
+config :tower_email,
   environment: System.get_env("DEPLOYMENT_ENV", to_string(config_env()))
+```
 
-# Configuring swoosh adapter in `TowerEmail.Mailer`:
+Configuring `Swoosh` adapter for `TowerEmail.Mailer`:
 
-# Example for local development
-# config :tower_email, TowerEmail.Mailer, adapter: Swoosh.Adapters.Local
+```elixir
+# config/dev.exs
+config :tower_email, TowerEmail.Mailer, adapter: Swoosh.Adapters.Local
 
-# Example for production
-config :tower_email, TowerEmail.Mailer,
-  adapter: Swoosh.Adapters.Postmark,
-  api_key: System.fetch_env!("POSTMARK_API_KEY")
+# config/prod.exs
+config :tower_email, TowerEmail.Mailer, adapter: Swoosh.Adapters.Postmark,
+
+# config/runtime.exs
+config :tower_email, TowerEmail.Mailer, api_key: System.fetch_env!("POSTMARK_API_KEY")
 ```
 
 Configuring `TowerEmail.Mailer` is analogous on how to configure any `Swoosh.Mailer` https://hexdocs.pm/swoosh/Swoosh.Mailer.html.
