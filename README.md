@@ -34,7 +34,7 @@ config(
   :reporters,
   [
     # along any other possible reporters
-    TowerEmail.Reporter
+    TowerEmail
   ]
 )
 ```

@@ -1,13 +1,8 @@
 defmodule TowerEmail.Reporter do
-  @moduledoc """
-  The reporter module that needs to be added to the list of Tower reporters.
-  """
-
-  @behaviour Tower.Reporter
+  @moduledoc false
 
   @default_level :error
 
-  @impl true
   def report_event(%Tower.Event{level: level} = event) do
     if Tower.equal_or_greater_level?(level, level()) do
       do_report_event(event)

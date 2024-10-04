@@ -5,7 +5,7 @@ defmodule TowerEmailTest do
   import ExUnit.CaptureLog, only: [capture_log: 1]
 
   setup do
-    Application.put_env(:tower, :reporters, [TowerEmail.Reporter])
+    Application.put_env(:tower, :reporters, [TowerEmail])
     Application.put_env(:tower_email, :to, "to@example.com")
 
     :ok
