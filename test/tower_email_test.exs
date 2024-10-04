@@ -8,11 +8,7 @@ defmodule TowerEmailTest do
     Application.put_env(:tower, :reporters, [TowerEmail.Reporter])
     Application.put_env(:tower_email, :to, "to@example.com")
 
-    Tower.attach()
-
-    on_exit(fn ->
-      Tower.detach()
-    end)
+    :ok
   end
 
   test "reports arithmetic error" do

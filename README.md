@@ -24,20 +24,7 @@ end
 
 ## Usage
 
-First, `Tower` error handler must be attached.
-
-```elixir
-# lib/<your_app>/application.ex
-
-defmodule YourApp.Application do
-  def start(_type, _args) do
-    Tower.attach()
-
-    # rest of your code
-  end
-```
-
-Then you register the reporter with Tower.
+Register the reporter with Tower.
 
 ```elixir
 # config/config.exs
