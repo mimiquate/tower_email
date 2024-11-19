@@ -17,7 +17,7 @@ The package can be installed by adding `tower_email` to your list of dependencie
 
 def deps do
   [
-    {:tower_email, "~> 0.5.1"}
+    {:tower_email, "~> 0.5.2"}
   ]
 end
 ```
