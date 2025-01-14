@@ -11,17 +11,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - elixir: '1.17'
-            erlang: '27.0'
+          - elixir: '1.18'
+            erlang: '27.2'
             lint: true
+          - elixir: '1.17'
+            erlang: '26.2.5.6'
           - elixir: '1.16'
-            erlang: '26.2.5'
+            erlang: '26.2.5.6'
             blend: swoosh_1_16
           - elixir: '1.15'
-            erlang: '25.3.2.13'
+            erlang: '25.3.2.16'
             blend: swoosh_1_15
           - elixir: '1.15'
-            erlang: '25.3.2.13'
+            erlang: '25.3.2.16'
             blend: swoosh_1_14
     steps:
       - uses: actions/checkout@v4
