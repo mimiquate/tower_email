@@ -14,7 +14,7 @@ defmodule TowerEmailTest do
   test "reports arithmetic error" do
     capture_log(fn ->
       in_unlinked_process(fn ->
-        1 / 0
+        exit(:badarith)
       end)
     end)
 
@@ -36,18 +36,21 @@ defmodule TowerEmailTest do
   test "reports long match error" do
     capture_log(fn ->
       in_unlinked_process(fn ->
-        [eleven: "eleven"] = [
-          one: "one",
-          two: "two",
-          three: "three",
-          four: "four",
-          five: "five",
-          six: "six",
-          seven: "seven",
-          eight: "eight",
-          nine: "nine",
-          ten: "ten"
-        ]
+        exit({
+          :badmatch,
+          [
+            one: "one",
+            two: "two",
+            three: "three",
+            four: "four",
+            five: "five",
+            six: "six",
+            seven: "seven",
+            eight: "eight",
+            nine: "nine",
+            ten: "ten"
+          ]
+        })
       end)
     end)
 
