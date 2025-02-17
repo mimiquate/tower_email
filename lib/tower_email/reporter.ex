@@ -38,9 +38,11 @@ defmodule TowerEmail.Reporter do
   end
 
   defp send_email(id, kind, reason, stacktrace \\ nil) do
-    {:ok, _} =
-      TowerEmail.Message.new(id, kind, reason, stacktrace)
-      |> TowerEmail.Mailer.deliver()
+    message = TowerEmail.Message.new(id, kind, reason, stacktrace)
+
+    async(fn ->
+      {:ok, _} = TowerEmail.Mailer.deliver(message)
+    end)
 
     :ok
   end
@@ -49,5 +51,10 @@ defmodule TowerEmail.Reporter do
     # This config env can be to any of the 8 levels in https://www.erlang.org/doc/apps/kernel/logger#t:level/0,
     # or special values :all and :none.
     Application.get_env(:tower_email, :level, @default_level)
+  end
+
+  defp async(fun) do
+    Tower.TaskSupervisor
+    |> Task.Supervisor.start_child(fun)
   end
 end
