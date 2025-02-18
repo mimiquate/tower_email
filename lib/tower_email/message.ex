@@ -1,18 +1,18 @@
 defmodule TowerEmail.Message do
   @moduledoc false
 
-  def new(id, title, formatted) do
+  def new(grouping_id, title, formatted, metadata \\ []) do
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
       from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
-      subject: subject(id, title),
-      html_body: html_body(id, formatted),
-      text_body: text_body(id, formatted)
+      subject: subject(grouping_id, title),
+      html_body: html_body(formatted, metadata),
+      text_body: text_body(formatted, metadata)
     )
   end
 
-  defp subject(id, title) do
-    truncate("[#{app_name()}][#{environment()}] #{title}", 100) <> " (#{id})"
+  defp subject(grouping_id, title) do
+    truncate("[#{app_name()}][#{environment()}] #{title}", 100) <> " (##{grouping_id})"
   end
 
   defp app_name do
@@ -40,11 +40,20 @@ defmodule TowerEmail.Message do
     """
     <pre><%= formatted %></pre>
 
-    <p>
-      ID: <%= id %>
-    </p>
+    <hr />
+
+    <table>
+      <tbody>
+        <%= for {key, value} <- metadata do %>
+          <tr>
+            <th><%= key %></th>
+            <td><samp><%= value %></samp></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
     """,
-    [:id, :formatted]
+    [:formatted, :metadata]
   )
 
   EEx.function_from_string(
@@ -53,8 +62,10 @@ defmodule TowerEmail.Message do
     """
     <%= formatted %>
 
-    id: <%= id %>
+    <%= for {key, value} <- metadata do %>
+      <%= key %>: <%= value %>
+    <% end %>
     """,
-    [:id, :formatted]
+    [:formatted, :metadata]
   )
 end
