@@ -15,7 +15,8 @@ defmodule TowerEmail.Reporter do
          reason: reason,
          stacktrace: stacktrace,
          similarity_id: similarity_id,
-         datetime: datetime
+         datetime: datetime,
+         metadata: metadata
        })
        when kind in [:error, :throw, :exit] do
     similarity_id = fixed_length_similarity_id(similarity_id)
@@ -26,7 +27,8 @@ defmodule TowerEmail.Reporter do
       Exception.format(kind, reason, stacktrace),
       id: id,
       similarity_id: similarity_id,
-      datetime: datetime
+      datetime: datetime,
+      metadata: inspect(metadata)
     )
   end
 
@@ -36,7 +38,8 @@ defmodule TowerEmail.Reporter do
          level: level,
          reason: reason,
          similarity_id: similarity_id,
-         datetime: datetime
+         datetime: datetime,
+         metadata: metadata
        }) do
     message = "[#{level}] #{if(is_binary(reason), do: reason, else: inspect(reason))}"
     similarity_id = fixed_length_similarity_id(similarity_id)
@@ -47,7 +50,8 @@ defmodule TowerEmail.Reporter do
       message,
       id: id,
       similarity_id: similarity_id,
-      datetime: datetime
+      datetime: datetime,
+      metadata: inspect(metadata)
     )
   end
 
