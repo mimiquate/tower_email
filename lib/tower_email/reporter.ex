@@ -18,17 +18,10 @@ defmodule TowerEmail.Reporter do
     )
   end
 
-  defp do_report_event(%Tower.Event{kind: :message, id: id, level: level, reason: message}) do
-    m =
-      if is_binary(message) do
-        message
-      else
-        inspect(message)
-      end
+  defp do_report_event(%Tower.Event{kind: :message, id: id, level: level, reason: reason}) do
+    message = "[#{level}] #{if(is_binary(reason), do: reason, else: inspect(reason))}"
 
-    title = "[#{level}] #{m}"
-
-    send_email(id, title, title)
+    send_email(id, message, message)
   end
 
   defp send_email(id, title, body) do
