@@ -25,7 +25,7 @@ defmodule TowerEmailTest do
         :email,
         %{
           subject:
-            "[tower_email][test] ArithmeticError: bad argument in arithmetic expression (" <>
+            "[tower_email][test] ** (ArithmeticError) bad argument in arithmetic expression (" <>
               <<_id::binary-size(36)>> <> ")"
         }
       },
@@ -61,7 +61,7 @@ defmodule TowerEmailTest do
         :email,
         %{
           subject:
-            ~s{[tower_email][test] MatchError: no match of right hand side value: [one: "one", two: "two", three... (} <>
+            ~s{[tower_email][test] ** (MatchError) no match of right hand side value: [one: "one", two: "two", t... (} <>
               <<_id::binary-size(36)>> <> ")"
         }
       },

@@ -9,21 +9,13 @@ defmodule TowerEmail.Reporter do
     end
   end
 
-  defp do_report_event(%Tower.Event{
-         kind: :error,
-         id: id,
-         reason: exception,
-         stacktrace: stacktrace
-       }) do
-    send_email(id, inspect(exception.__struct__), Exception.message(exception), stacktrace)
-  end
-
-  defp do_report_event(%Tower.Event{kind: :throw, id: id, reason: reason, stacktrace: stacktrace}) do
-    send_email(id, "Uncaught throw", reason, stacktrace)
-  end
-
-  defp do_report_event(%Tower.Event{kind: :exit, id: id, reason: reason, stacktrace: stacktrace}) do
-    send_email(id, "Exit", reason, stacktrace)
+  defp do_report_event(%Tower.Event{kind: kind, id: id, reason: reason, stacktrace: stacktrace})
+       when kind in [:error, :throw, :exit] do
+    send_email(
+      id,
+      Exception.format_banner(kind, reason, stacktrace),
+      Exception.format(kind, reason, stacktrace)
+    )
   end
 
   defp do_report_event(%Tower.Event{kind: :message, id: id, level: level, reason: message}) do
@@ -34,14 +26,16 @@ defmodule TowerEmail.Reporter do
         inspect(message)
       end
 
-    send_email(id, "[#{level}] #{m}", "")
+    title = "[#{level}] #{m}"
+
+    send_email(id, title, title)
   end
 
-  defp send_email(id, kind, reason, stacktrace \\ nil) do
-    message = TowerEmail.Message.new(id, kind, reason, stacktrace)
+  defp send_email(id, title, body) do
+    email_message = TowerEmail.Message.new(id, title, body)
 
     async(fn ->
-      {:ok, _} = TowerEmail.Mailer.deliver(message)
+      {:ok, _} = TowerEmail.Mailer.deliver(email_message)
     end)
 
     :ok

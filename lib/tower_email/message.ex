@@ -1,18 +1,18 @@
 defmodule TowerEmail.Message do
   @moduledoc false
 
-  def new(id, kind, reason, stacktrace \\ nil) do
+  def new(id, title, formatted) do
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
       from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
-      subject: subject(id, kind, reason),
-      html_body: html_body(id, kind, reason, stacktrace),
-      text_body: text_body(id, kind, reason, stacktrace)
+      subject: subject(id, title),
+      html_body: html_body(id, formatted),
+      text_body: text_body(id, formatted)
     )
   end
 
-  defp subject(id, kind, reason) do
-    truncate("[#{app_name()}][#{environment()}] #{kind}: #{reason}", 100) <> " (#{id})"
+  defp subject(id, title) do
+    truncate("[#{app_name()}][#{environment()}] #{title}", 100) <> " (#{id})"
   end
 
   defp app_name do
@@ -38,42 +38,23 @@ defmodule TowerEmail.Message do
     :defp,
     :html_body,
     """
-    <h2>
-      <%= kind %>
-    </h2>
-
-    <h4>
-      <%= reason %>
-    </h4>
-
-    <%= if stacktrace do %>
-      <code>
-        <%= for entry <- stacktrace do %>
-          &nbsp;
-          <%= Exception.format_stacktrace_entry(entry) %>
-          <br />
-        <% end %>
-      </code>
-    <% end %>
+    <pre><%= formatted %></pre>
 
     <p>
       ID: <%= id %>
     </p>
     """,
-    [:id, :kind, :reason, :stacktrace]
+    [:id, :formatted]
   )
 
   EEx.function_from_string(
     :defp,
     :text_body,
     """
-      <%= kind %>
-      <%= reason %>
-      <%= if stacktrace do %>
-        <%= Exception.format_stacktrace(stacktrace) %>
-      <% end %>
-      id: <%= id %>
+    <%= formatted %>
+
+    id: <%= id %>
     """,
-    [:id, :kind, :reason, :stacktrace]
+    [:id, :formatted]
   )
 end
