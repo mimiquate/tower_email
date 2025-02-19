@@ -3,7 +3,7 @@ defmodule TowerEmail.MixProject do
 
   @description "Error tracking and reporting to your e-mail inbox"
   @source_url "https://github.com/mimiquate/tower_email"
-  @version "0.5.2"
+  @version "0.6.0"
 
   def project do
     [
