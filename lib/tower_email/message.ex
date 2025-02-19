@@ -38,16 +38,14 @@ defmodule TowerEmail.Message do
     :defp,
     :html_body,
     """
-    <pre><%= formatted %></pre>
+    <pre style="font-size:1.2em"><%= formatted %></pre>
 
-    <hr />
-
-    <table>
+    <table style="margin-top:3em">
       <tbody>
         <%= for {key, value} <- metadata do %>
           <tr>
-            <th><%= key %></th>
-            <td><samp><%= value %></samp></td>
+            <th align="right" style="font-weight:lighter;color:#666"><%= key %></th>
+            <td style="padding-left:1em"><samp><%= value %></samp></td>
           </tr>
         <% end %>
       </tbody>
