@@ -69,6 +69,33 @@ defmodule TowerEmailTest do
     )
   end
 
+  test "reports error when the reason is a tuple" do
+    capture_log(fn ->
+      in_unlinked_process(fn ->
+        exit(
+          {{%{
+              message:
+                "tcp recv: closed (the connection was closed by the pool, possibly due to a timeout or because the pool has been terminated)",
+              severity: :error,
+              reason: :error
+            }, []}, {GenServer, :call, [Foo, {:foo, :bar}]}}
+        )
+      end)
+    end)
+
+    assert_receive(
+      {
+        :email,
+        %{
+          subject:
+            "[tower_email][test] ** (exit) exited in: GenServer.call(Foo, {:foo, :bar})\n    ** (EXIT) {%{messa... (#" <>
+              <<_id::binary-size(10)>> <> ")"
+        }
+      },
+      1_000
+    )
+  end
+
   defp in_unlinked_process(fun) when is_function(fun, 0) do
     {:ok, pid} = Task.Supervisor.start_link()
 
