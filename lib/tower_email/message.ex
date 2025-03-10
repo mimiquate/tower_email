@@ -12,7 +12,8 @@ defmodule TowerEmail.Message do
   end
 
   defp subject(grouping_id, title) do
-    truncate("[#{app_name()}][#{environment()}] #{title}", 100) <> " (##{grouping_id})"
+    truncate("[#{app_name()}][#{environment()}] #{title}", 100) <>
+      " (##{format_grouping_id(grouping_id)})"
   end
 
   defp app_name do
@@ -21,6 +22,14 @@ defmodule TowerEmail.Message do
 
   defp environment do
     Application.fetch_env!(:tower_email, :environment)
+  end
+
+  defp format_grouping_id(grouping_id) do
+    if String.Chars.impl_for(grouping_id) do
+      grouping_id
+    else
+      inspect(grouping_id)
+    end
   end
 
   defp truncate(text, max_length) do
