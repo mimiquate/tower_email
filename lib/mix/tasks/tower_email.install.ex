@@ -97,76 +97,108 @@ if Code.ensure_loaded?(Igniter) && Code.ensure_loaded?(Tower.Igniter) do
       |> Path.join(file_name)
     end
 
+    defp flatten_ast(ast) do
+      ast
+      |> Macro.prewalk([], fn node, acc ->
+        {node, [node | acc]}
+      end)
+      |> elem(1)
+      |> Enum.reverse()
+    end
+
     defp add_commented_config(igniter, file_path, comment, config_line) do
       Igniter.update_elixir_file(igniter, file_path, fn zipper ->
-        # Check if the comment already exists to avoid duplicate comments
-        file_content =
-          zipper
-          |> Zipper.root()
-          |> Sourceror.to_string()
-
-        if String.contains?(file_content, "# #{comment}") do
-          # Comment already exists, don't add it again
+        if check_existing_comment_and_config(zipper, comment, config_line) do
           {:ok, zipper}
         else
-          # Add the commented lines directly
-          zipper =
-            zipper
-            |> Zipper.topmost()
-            |> Zipper.update(fn node ->
-              case node do
-                {:__block__, meta, children} ->
-                  new_meta =
-                    meta
-                    |> Keyword.update(
-                      :trailing_comments,
-                      [
-                        %{
-                          line: 1,
-                          text: "# #{comment}",
-                          column: 1,
-                          next_eol_count: 0,
-                          previous_eol_count: 2
-                        },
-                        %{
-                          line: 2,
-                          text: "# #{config_line}",
-                          column: 1,
-                          next_eol_count: 1,
-                          previous_eol_count: 1
-                        }
-                      ],
-                      fn existing_comments ->
-                        existing_comments ++
-                          [
-                            %{
-                              line: 1,
-                              text: "# #{comment}",
-                              column: 1,
-                              next_eol_count: 0,
-                              previous_eol_count: 2
-                            },
-                            %{
-                              line: 2,
-                              text: "# #{config_line}",
-                              column: 1,
-                              next_eol_count: 1,
-                              previous_eol_count: 1
-                            }
-                          ]
-                      end
-                    )
-
-                  {:__block__, new_meta, children}
-
-                other ->
-                  other
-              end
-            end)
-
-          {:ok, zipper}
+          {:ok, add_comment_to_ast(zipper, comment, config_line)}
         end
       end)
+    end
+
+    defp check_existing_comment_and_config(zipper, comment, config_line) do
+      {comment_exists?, config_exists?} =
+        zipper
+        |> Zipper.root()
+        |> flatten_ast()
+        |> Enum.reduce_while({false, false}, fn node, acc ->
+          cond do
+            mailer_config_node?(node) and mailer_config_matches?(config_line) ->
+              {:halt, merge_states(acc, {false, true})}
+
+            has_metadata?(node) and comment_exists_in_node?(elem(node, 1), comment) ->
+              {:halt, merge_states(acc, {true, false})}
+
+            true ->
+              {:cont, merge_states(acc, {false, false})}
+          end
+        end)
+
+      comment_exists? || config_exists?
+    end
+
+    defp merge_states(
+           {comment_found_acc, config_found_acc},
+           {comment_found_new, config_found_new}
+         ) do
+      {comment_found_acc or comment_found_new, config_found_acc or config_found_new}
+    end
+
+    defp mailer_config_node?(node) do
+      match?(
+        {:config, _meta,
+         [{:__block__, _, [:tower_email]}, {:__aliases__, _, [:TowerEmail, :Mailer]}, _opts]},
+        node
+      )
+    end
+
+    defp has_metadata?(node) do
+      match?({_, _meta, _}, node)
+    end
+
+    defp mailer_config_matches?(config_line) do
+      String.contains?(config_line, "TowerEmail.Mailer")
+    end
+
+    defp comment_exists_in_node?(meta, comment) do
+      trailing_comments = Keyword.get(meta, :trailing_comments, [])
+      leading_comments = Keyword.get(meta, :leading_comments, [])
+
+      Enum.any?(trailing_comments ++ leading_comments, fn comment_map ->
+        Map.get(comment_map, :text) == "# #{comment}"
+      end)
+    end
+
+    defp add_comment_to_ast(zipper, comment, config_line) do
+      zipper
+      |> Zipper.topmost()
+      |> Zipper.update(fn node ->
+        with {:__block__, meta, children} <- node do
+          new_meta = update_trailing_comments(meta, comment, config_line)
+          {:__block__, new_meta, children}
+        end
+      end)
+    end
+
+    defp update_trailing_comments(meta, comment, config_line) do
+      new_comments = [
+        create_comment_map(comment, 1, 0, 2),
+        create_comment_map(config_line, 2, 1, 1)
+      ]
+
+      Keyword.update(meta, :trailing_comments, new_comments, fn existing_comments ->
+        existing_comments ++ new_comments
+      end)
+    end
+
+    defp create_comment_map(text, line, next_eol_count, previous_eol_count) do
+      %{
+        line: line,
+        text: "# #{text}",
+        column: 1,
+        next_eol_count: next_eol_count,
+        previous_eol_count: previous_eol_count
+      }
     end
   end
 else

@@ -65,5 +65,28 @@ if Code.ensure_loaded?(Tower.Igniter) do
       |> Igniter.compose_task("tower_email.install", [])
       |> assert_unchanged()
     end
+
+    test "does not add commented configs when actual configs exist" do
+      test_project(
+        files: %{
+          "config/config.exs" => """
+          import Config
+          """,
+          "config/prod.exs" => """
+          import Config
+
+          config :tower_email, TowerEmail.Mailer, adapter: Swoosh.Adapter.SMTP
+          """,
+          "config/runtime.exs" => """
+          import Config
+
+          config :tower_email, TowerEmail.Mailer, api_key: System.fetch_env!("SMTP_PASSWORD")
+          """
+        }
+      )
+      |> Igniter.compose_task("tower_email.install", [])
+      |> apply_igniter!()
+      |> assert_unchanged()
+    end
   end
 end
