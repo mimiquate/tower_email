@@ -37,6 +37,7 @@ defmodule TowerEmail.MixProject do
 
       # Optional
       {:hackney, "~> 1.20", optional: true},
+      {:igniter, "~> 0.6", optional: true},
 
       # Dev
       {:blend, "~> 0.5.0", only: :dev},
