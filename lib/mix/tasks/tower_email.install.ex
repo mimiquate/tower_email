@@ -43,7 +43,7 @@ if Code.ensure_loaded?(Igniter) && Code.ensure_loaded?(Tower.Igniter) do
       runtime_file_path = config_file_path(igniter, "runtime.exs")
 
       igniter
-      |> add_reporter_to_config(TowerEmail)
+      |> reporters_list_append(TowerEmail)
       |> Igniter.Project.Config.configure(
         "config.exs",
         :tower_email,
