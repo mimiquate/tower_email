@@ -17,8 +17,6 @@ if Code.ensure_loaded?(Igniter) && Code.ensure_loaded?(Tower.Igniter) do
 
     use Igniter.Mix.Task
 
-    import Tower.Igniter
-
     @impl Igniter.Mix.Task
     def info(_argv, _composing_task) do
       %Igniter.Mix.Task.Info{group: :tower, example: @example}
@@ -31,7 +29,7 @@ if Code.ensure_loaded?(Igniter) && Code.ensure_loaded?(Tower.Igniter) do
       runtime_file_path = config_file_path(igniter, "runtime.exs")
 
       igniter
-      |> reporters_list_append(TowerEmail)
+      |> Tower.Igniter.reporters_list_append(TowerEmail)
       |> Igniter.Project.Config.configure(
         "config.exs",
         :tower_email,
