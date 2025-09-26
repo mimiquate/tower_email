@@ -1,74 +1,103 @@
-if Code.ensure_loaded?(Igniter) && Code.ensure_loaded?(Tower.Igniter) do
-  defmodule Mix.Tasks.TowerEmail.Install do
-    @example "mix igniter.install tower_email"
+defmodule Mix.Tasks.TowerEmail.Install.Docs do
+  @moduledoc false
 
-    @shortdoc "Installs TowerEmail. Invoke with `mix igniter.install tower_email`"
-    @moduledoc """
-    #{@shortdoc}
+  @spec task_name() :: String.t()
+  def task_name do
+    "tower_email.install"
+  end
+
+  @spec short_doc() :: String.t()
+  def short_doc do
+    "Installs TowerEmail"
+  end
+
+  @spec example() :: String.t()
+  def example do
+    "mix #{task_name()}"
+  end
+
+  @spec long_doc() :: String.t()
+  def long_doc do
+    """
+    #{short_doc()}
 
     ## Example
 
-    ```bash
-    #{@example}
+    ```sh
+    #{example()}
     ```
     """
+  end
+end
 
-    alias Sourceror.Zipper
+if Code.ensure_loaded?(Igniter) and
+     Code.ensure_loaded?(Tower.Igniter) and
+     function_exported?(Tower.Igniter, :runtime_configure_reporter, 3) do
+  defmodule Mix.Tasks.TowerEmail.Install do
+    @shortdoc "#{__MODULE__.Docs.short_doc()}"
+
+    @moduledoc __MODULE__.Docs.long_doc()
 
     use Igniter.Mix.Task
 
+    alias Sourceror.Zipper
+
     @impl Igniter.Mix.Task
     def info(_argv, _composing_task) do
-      %Igniter.Mix.Task.Info{group: :tower, example: @example}
+      %Igniter.Mix.Task.Info{
+        group: :tower,
+        example: __MODULE__.Docs.example()
+      }
     end
 
     @impl Igniter.Mix.Task
     def igniter(igniter) do
-      app_name = Igniter.Project.Application.app_name(igniter)
-      prod_file_path = config_file_path(igniter, "prod.exs")
-      runtime_file_path = config_file_path(igniter, "runtime.exs")
-
       igniter
       |> Tower.Igniter.reporters_list_append(TowerEmail)
-      |> Igniter.Project.Config.configure(
-        "config.exs",
-        :tower_email,
-        [:from],
-        {:code, Sourceror.parse_string!("{\"Tower\", \"tower@<YOUR_DOMAIN>\"}")},
-        after: &match?({:config, _, [{_, _, [:tower]} | _]}, &1.node)
-      )
-      |> Igniter.Project.Config.configure(
-        "config.exs",
-        :tower_email,
-        [:to],
-        "<RECIPIENT EMAIL ADDRESS>"
-      )
-      |> Igniter.Project.Config.configure(
-        "runtime.exs",
-        :tower_email,
-        [:otp_app],
-        app_name
-      )
-      |> Igniter.Project.Config.configure(
-        "runtime.exs",
-        :tower_email,
-        [:environment],
-        {:code,
-         Sourceror.parse_string!("System.get_env(\"DEPLOYMENT_ENV\", to_string(config_env()))")}
-      )
       |> Igniter.Project.Config.configure(
         "dev.exs",
         :tower_email,
         [TowerEmail.Mailer, :adapter],
         Swoosh.Adapters.Local
       )
+      |> Igniter.Project.Config.configure(
+        "test.exs",
+        :tower_email,
+        [TowerEmail.Mailer, :adapter],
+        code_value(~s[Swoosh.Adapters.Test])
+      )
+      |> Igniter.Project.Config.configure(
+        "config.exs",
+        :tower_email,
+        [:otp_app],
+        Igniter.Project.Application.app_name(igniter),
+        after: &match?({:config, _, [{_, _, [:tower]} | _]}, &1.node)
+      )
+      |> Igniter.Project.Config.configure(
+        "config.exs",
+        :tower_email,
+        [:from],
+        code_value(~s[{"Tower", "tower@<YOUR_DOMAIN>"}]),
+        after: &match?({:config, _, [{_, _, [:tower]} | _]}, &1.node)
+      )
+      |> Igniter.Project.Config.configure(
+        "config.exs",
+        :tower_email,
+        [:to],
+        "<RECIPIENT_EMAIL_ADDRESS>",
+        after: &match?({:config, _, [{_, _, [:tower]} | _]}, &1.node)
+      )
+      |> Tower.Igniter.runtime_configure_reporter(
+        :tower_email,
+        environment: code_value(~s[System.get_env("DEPLOYMENT_ENV", to_string(config_env()))])
+      )
       |> add_commented_config(
-        prod_file_path,
+        config_file_path(igniter, "prod.exs"),
         "Uncomment this line to use Postmark as Provider or use the provider of your choosing",
         "config :tower_email, TowerEmail.Mailer, adapter: Swoosh.Adapter.Postmark"
       )
       |> add_commented_config(
-        runtime_file_path,
+        config_file_path(igniter, "runtime.exs"),
         "Uncomment this line to use configure Postmark's API key, or configure your providers env variables",
         "config :tower_email, TowerEmail.Mailer, api_key: System.fetch_env!(\"POSTMARK_API_KEY\")"
       )
@@ -186,33 +215,28 @@ if Code.ensure_loaded?(Igniter) && Code.ensure_loaded?(Tower.Igniter) do
         previous_eol_count: previous_eol_count
       }
     end
+
+    defp code_value(value) do
+      {:code, Sourceror.parse_string!(value)}
+    end
   end
 else
   defmodule Mix.Tasks.TowerEmail.Install do
-    @example "mix igniter.install tower_email"
+    @shortdoc "#{__MODULE__.Docs.short_doc()} | Install `igniter` to use"
 
-    @shortdoc "Installs TowerEmail. Invoke with `mix igniter.install tower_email`"
+    @moduledoc __MODULE__.Docs.long_doc()
 
-    @moduledoc """
-    #{@shortdoc}
+    @error_message """
+    The task '#{__MODULE__.Docs.task_name()}' requires igniter plus tower >= 0.8.4. Please install igniter and/or update tower and try again.
 
-    ## Example
-
-    ```bash
-    #{@example}
-    ```
+    For more information, see: https://hexdocs.pm/igniter/readme.html#installation
     """
 
     use Mix.Task
 
     @impl Mix.Task
     def run(_argv) do
-      Mix.shell().error("""
-      The task 'tower_email.install' requires igniter and tower > v0.8.3. Please install igniter or update tower and try again.
-
-      For more information, see: https://hexdocs.pm/igniter/readme.html#installation
-      """)
-
+      Mix.shell().error(@error_message)
       exit({:shutdown, 1})
     end
   end
