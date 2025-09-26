@@ -30,7 +30,9 @@ defmodule Mix.Tasks.TowerEmail.Install.Docs do
   end
 end
 
-if Code.ensure_loaded?(Igniter) and Code.ensure_loaded?(Tower.Igniter) do
+if Code.ensure_loaded?(Igniter) and
+     Code.ensure_loaded?(Tower.Igniter) and
+     function_exported?(Tower.Igniter, :runtime_configure_reporter, 3) do
   defmodule Mix.Tasks.TowerEmail.Install do
     @shortdoc "#{__MODULE__.Docs.short_doc()}"
 
@@ -41,7 +43,7 @@ if Code.ensure_loaded?(Igniter) and Code.ensure_loaded?(Tower.Igniter) do
     @impl Igniter.Mix.Task
     def info(_argv, _composing_task) do
       %Igniter.Mix.Task.Info{
-        group: :tower_email,
+        group: :tower,
         example: __MODULE__.Docs.example()
       }
     end
@@ -55,13 +57,13 @@ if Code.ensure_loaded?(Igniter) and Code.ensure_loaded?(Tower.Igniter) do
         "dev.exs",
         :tower_email,
         [TowerEmail.Mailer, :adapter],
-        code_value(~s[Swoosh.Adapters.Local])
+        Swoosh.Adapters.Local
       )
       |> Igniter.Project.Config.configure(
         "test.exs",
         :tower_email,
         [TowerEmail.Mailer, :adapter],
-        code_value(~s[Swoosh.Adapters.Test])
+        Swoosh.Adapters.Test
       )
       |> Igniter.Project.Config.configure(
         "config.exs",
