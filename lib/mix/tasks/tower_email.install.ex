@@ -64,7 +64,7 @@ if Code.ensure_loaded?(Igniter) and
         "test.exs",
         :tower_email,
         [TowerEmail.Mailer, :adapter],
-        code_value(~s[Swoosh.Adapters.Test])
+        Swoosh.Adapters.Test
       )
       |> Igniter.Project.Config.configure(
         "config.exs",
