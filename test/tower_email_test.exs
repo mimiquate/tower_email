@@ -60,9 +60,14 @@ defmodule TowerEmailTest do
       {
         :email,
         %{
+          # Loosely match on formatted value given Exception.message changed it's format from
+          # Elixir 1.19+ compared to Elixir 1.18 or less
           subject:
-            ~s{[tower_email][test] ** (MatchError) no match of right hand side value: [one: "one", two: "two", t... (#} <>
-              <<_id::binary-size(10)>> <> ")"
+            "[tower_email][test] ** (MatchError) no match of right hand side value:" <>
+              <<_formatted_value::binary-size(27)>> <>
+              "... (#" <>
+              <<_grouping_id::binary-size(10)>> <>
+              ")"
         }
       },
       1_000
