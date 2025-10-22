@@ -22,7 +22,7 @@ def deps do
 end
 ```
 
-## Usage
+## Setup
 
 Register the reporter with Tower.
 
@@ -68,6 +68,29 @@ config :tower_email, TowerEmail.Mailer, api_key: System.fetch_env!("POSTMARK_API
 ```
 
 Configuring `TowerEmail.Mailer` is analogous on how to configure any `Swoosh.Mailer` https://hexdocs.pm/swoosh/Swoosh.Mailer.html.
+
+## Reporting
+
+That's it.
+There's no extra source code needed to get reports in your e-mail inbox.
+
+Tower will automatically report any errors (exceptions, throws or abnormal exits) occurring in your application.
+That includes errors in any plug call (including Phoenix), Oban jobs, async task or any other Elixir process.
+
+### Manual reporting
+
+You can manually report errors just by informing `Tower` about any manually caught exceptions, throws or abnormal exits.
+
+```elixir
+try do
+  # possibly crashing code
+rescue
+  exception ->
+    Tower.report_exception(exception, __STACKTRACE__)
+end
+```
+
+More details on https://hexdocs.pm/tower/Tower.html#module-manual-reporting.
 
 ## License
 
