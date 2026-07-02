@@ -36,12 +36,12 @@ defmodule TowerEmail.MixProject do
       {:swoosh, "~> 1.14"},
 
       # Optional
-      {:hackney, "~> 1.20", optional: true},
       {:igniter, "~> 0.6", optional: true},
 
-      # Dev
+      # Dev & Test
       {:blend, "~> 0.5.0", only: :dev},
-      {:ex_doc, "~> 0.40.0", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.40.0", only: :dev, runtime: false},
+      {:hackney, "~> 1.20", only: [:dev, :test]}
     ]
   end
 
