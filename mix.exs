@@ -41,7 +41,7 @@ defmodule TowerEmail.MixProject do
       # Dev & Test
       {:blend, "~> 0.5.0", only: :dev},
       {:ex_doc, "~> 0.40.0", only: :dev, runtime: false},
-      {:hackney, "~> 1.20", only: [:dev, :test]}
+      {:hackney, "~> 4.8", only: [:dev, :test]}
     ]
   end
 
