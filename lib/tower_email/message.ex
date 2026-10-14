@@ -1,13 +1,15 @@
 defmodule TowerEmail.Message do
   @moduledoc false
 
-  def new(grouping_id, title, formatted, metadata \\ []) do
+  def new(grouping_id, title, formatted, metadata \\ [], opts \\ []) do
+    occurrence_url = Keyword.get(opts, :occurrence_url)
+
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
       from: Application.get_env(:tower_email, :from, {"Undefined From", "undefined@example.com"}),
       subject: subject(grouping_id, title),
-      html_body: html_body(formatted, metadata),
-      text_body: text_body(formatted, metadata)
+      html_body: html_body(formatted, metadata, occurrence_url),
+      text_body: text_body(formatted, metadata, occurrence_url)
     )
   end
 
@@ -38,7 +40,9 @@ defmodule TowerEmail.Message do
     :defp,
     :html_body,
     """
-    <pre style="font-size:1.2em"><%= formatted %></pre>
+    <%= if occurrence_url do %><p><a href="<%= occurrence_url %>">View occurrence in Tower Web</a></p>
+
+    <% end %><pre style="font-size:1.2em"><%= formatted %></pre>
 
     <table style="margin-top:3em">
       <tbody>
@@ -51,19 +55,21 @@ defmodule TowerEmail.Message do
       </tbody>
     </table>
     """,
-    [:formatted, :metadata]
+    [:formatted, :metadata, :occurrence_url]
   )
 
   EEx.function_from_string(
     :defp,
     :text_body,
     """
-    <%= formatted %>
+    <%= if occurrence_url do %>View occurrence in Tower Web: <%= occurrence_url %>
+
+    <% end %><%= formatted %>
 
     <%= for {key, value} <- metadata do %>
       <%= key %>: <%= value %>
     <% end %>
     """,
-    [:formatted, :metadata]
+    [:formatted, :metadata, :occurrence_url]
   )
 end

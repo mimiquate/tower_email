@@ -92,6 +92,21 @@ end
 
 More details on https://hexdocs.pm/tower/Tower.html#module-manual-reporting.
 
+## Linking to TowerWeb
+
+If your application also uses [TowerWeb](https://github.com/mimiquate/tower_web) to store and browse events, each e-mail includes a "View occurrence in Tower Web" link to that exact occurrence in the dashboard.
+
+The link appears when TowerWeb knows its endpoint and the router where the dashboard is mounted:
+
+```elixir
+# config/runtime.exs
+config :tower_web,
+  endpoint: MyAppWeb.Endpoint,
+  router: MyAppWeb.Router
+```
+
+Without this configuration, e-mails are sent without the link.
+
 ## License
 
 Copyright 2024 Mimiquate

@@ -1,6 +1,11 @@
 defmodule TowerEmail.Reporter do
   @moduledoc false
 
+  # tower_web is an optional dependency
+  @compile {:no_warn_undefined, TowerWeb}
+
+  require Logger
+
   @default_level :error
 
   def report_event(%Tower.Event{level: level} = event) do
@@ -25,10 +30,13 @@ defmodule TowerEmail.Reporter do
       similarity_id,
       Exception.format_banner(kind, reason, stacktrace),
       Exception.format(kind, reason, stacktrace),
-      id: id,
-      similarity_id: similarity_id,
-      datetime: datetime,
-      metadata: inspect(metadata)
+      [
+        id: id,
+        similarity_id: similarity_id,
+        datetime: datetime,
+        metadata: inspect(metadata)
+      ],
+      occurrence_url(id)
     )
   end
 
@@ -48,15 +56,19 @@ defmodule TowerEmail.Reporter do
       similarity_id,
       message,
       message,
-      id: id,
-      similarity_id: similarity_id,
-      datetime: datetime,
-      metadata: inspect(metadata)
+      [
+        id: id,
+        similarity_id: similarity_id,
+        datetime: datetime,
+        metadata: inspect(metadata)
+      ],
+      occurrence_url(id)
     )
   end
 
-  defp send_email(similarity_id, title, body, metadata) do
-    email_message = TowerEmail.Message.new(similarity_id, title, body, metadata)
+  defp send_email(similarity_id, title, body, metadata, occurrence_url) do
+    email_message =
+      TowerEmail.Message.new(similarity_id, title, body, metadata, occurrence_url: occurrence_url)
 
     async(fn ->
       {:ok, _} = TowerEmail.Mailer.deliver(email_message)
@@ -69,6 +81,20 @@ defmodule TowerEmail.Reporter do
     # This config env can be to any of the 8 levels in https://www.erlang.org/doc/apps/kernel/logger#t:level/0,
     # or special values :all and :none.
     Application.get_env(:tower_email, :level, @default_level)
+  end
+
+  defp occurrence_url(id) do
+    if Code.ensure_loaded?(TowerWeb) do
+      TowerWeb.occurrence_url(id)
+    end
+  rescue
+    # The link is a nice-to-have: never let it prevent the email
+    exception ->
+      Logger.warning(
+        "TowerEmail couldn't build the occurrence URL: #{Exception.message(exception)}"
+      )
+
+      nil
   end
 
   defp fixed_length_similarity_id(number) do
