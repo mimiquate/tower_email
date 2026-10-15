@@ -1,8 +1,8 @@
 defmodule TowerEmail.Message do
   @moduledoc false
 
-  def new(grouping_id, title, formatted, metadata \\ [], opts \\ []) do
-    occurrence_url = Keyword.get(opts, :occurrence_url)
+  def new(grouping_id, title, formatted, metadata \\ []) do
+    occurrence_url = occurrence_url(metadata[:id])
 
     Swoosh.Email.new(
       to: Application.fetch_env!(:tower_email, :to),
@@ -34,15 +34,19 @@ defmodule TowerEmail.Message do
     end
   end
 
+  defp occurrence_url(id) do
+    if Code.ensure_loaded?(TowerWeb) and function_exported?(TowerWeb, :occurrence_url, 1) do
+      TowerWeb.occurrence_url(id)
+    end
+  end
+
   require EEx
 
   EEx.function_from_string(
     :defp,
     :html_body,
     """
-    <%= if occurrence_url do %><p><a href="<%= occurrence_url %>">View occurrence in Tower Web</a></p>
-
-    <% end %><pre style="font-size:1.2em"><%= formatted %></pre>
+    <pre style="font-size:1.2em"><%= formatted %></pre>
 
     <table style="margin-top:3em">
       <tbody>
@@ -54,6 +58,9 @@ defmodule TowerEmail.Message do
         <% end %>
       </tbody>
     </table>
+    <%= if occurrence_url do %>
+    <p style="margin-top:2em"><a href="<%= occurrence_url %>">View occurrence in Tower Web</a><span style="display:none"><%= metadata[:id] %></span></p>
+    <% end %>
     """,
     [:formatted, :metadata, :occurrence_url]
   )
@@ -62,12 +69,13 @@ defmodule TowerEmail.Message do
     :defp,
     :text_body,
     """
-    <%= if occurrence_url do %>View occurrence in Tower Web: <%= occurrence_url %>
-
-    <% end %><%= formatted %>
+    <%= formatted %>
 
     <%= for {key, value} <- metadata do %>
       <%= key %>: <%= value %>
+    <% end %>
+    <%= if occurrence_url do %>
+    View occurrence in Tower Web: <%= occurrence_url %>
     <% end %>
     """,
     [:formatted, :metadata, :occurrence_url]
