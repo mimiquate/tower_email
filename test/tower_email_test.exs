@@ -88,6 +88,17 @@ defmodule TowerEmailTest do
     assert email.text_body =~ "View occurrence in Tower Web: #{url}"
   end
 
+  test "sends the email without the link when base_url is not configured" do
+    Application.delete_env(:tower_web, :base_url)
+
+    Tower.report_message(:error, "Something went wrong")
+
+    assert_receive({:email, email}, 1_000)
+
+    refute email.html_body =~ "View occurrence in Tower Web"
+    refute email.text_body =~ "View occurrence in Tower Web"
+  end
+
   defp event_id(email) do
     [_, id] = Regex.run(~r/id: ([0-9a-f-]{36})/, email.text_body)
     id
