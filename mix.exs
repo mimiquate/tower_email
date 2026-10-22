@@ -37,6 +37,7 @@ defmodule TowerEmail.MixProject do
 
       # Optional
       {:igniter, "~> 0.6", optional: true},
+      {:tower_web, "~> 0.9", optional: true},
 
       # Dev & Test
       {:blend, "~> 0.5.0", only: :dev},

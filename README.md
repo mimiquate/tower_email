@@ -92,6 +92,10 @@ end
 
 More details on https://hexdocs.pm/tower/Tower.html#module-manual-reporting.
 
+## Linking to TowerWeb
+
+If your application also uses [TowerWeb](https://github.com/mimiquate/tower_web) to store and browse events, each e-mail includes a "View occurrence in Tower Web" link to that exact occurrence in the dashboard. To enable it, set TowerWeb's `base_url` as described in its [setup](https://github.com/mimiquate/tower_web#setup).
+
 ## License
 
 Copyright 2024 Mimiquate

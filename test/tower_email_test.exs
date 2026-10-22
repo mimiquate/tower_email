@@ -4,9 +4,12 @@ defmodule TowerEmailTest do
 
   import ExUnit.CaptureLog, only: [capture_log: 1]
 
+  @base_url "http://localhost:4000/tower_errors"
+
   setup do
     Application.put_env(:tower, :reporters, [TowerEmail])
     Application.put_env(:tower_email, :to, "to@example.com")
+    Application.put_env(:tower_web, :base_url, @base_url)
 
     :ok
   end
@@ -72,6 +75,33 @@ defmodule TowerEmailTest do
       },
       1_000
     )
+  end
+
+  test "links to the Tower Web occurrence of the reported event" do
+    Tower.report_message(:error, "Something went wrong")
+
+    assert_receive({:email, email}, 1_000)
+
+    url = "#{@base_url}/occurrences/#{event_id(email)}"
+
+    assert email.html_body =~ ~s(<a href="#{url}">View occurrence in Tower Web</a>)
+    assert email.text_body =~ "View occurrence in Tower Web: #{url}"
+  end
+
+  test "sends the email without the link when base_url is not configured" do
+    Application.delete_env(:tower_web, :base_url)
+
+    Tower.report_message(:error, "Something went wrong")
+
+    assert_receive({:email, email}, 1_000)
+
+    refute email.html_body =~ "View occurrence in Tower Web"
+    refute email.text_body =~ "View occurrence in Tower Web"
+  end
+
+  defp event_id(email) do
+    [_, id] = Regex.run(~r/id: ([0-9a-f-]{36})/, email.text_body)
+    id
   end
 
   defp in_unlinked_process(fun) when is_function(fun, 0) do
