@@ -56,13 +56,17 @@ defmodule TowerEmail.Reporter do
   end
 
   defp send_email(similarity_id, title, body, metadata) do
-    email_message = TowerEmail.Message.new(similarity_id, title, body, metadata)
+    case TowerEmail.Message.new(similarity_id, title, body, metadata) do
+      nil ->
+        :ok
 
-    async(fn ->
-      {:ok, _} = TowerEmail.Mailer.deliver(email_message)
-    end)
+      email_message ->
+        async(fn ->
+          {:ok, _} = TowerEmail.Mailer.deliver(email_message)
+        end)
 
-    :ok
+        :ok
+    end
   end
 
   defp level do
