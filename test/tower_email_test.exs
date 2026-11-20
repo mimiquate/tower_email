@@ -91,6 +91,24 @@ defmodule TowerEmailTest do
     refute_receive({:email, _email}, 1_000)
   end
 
+  test "marks the email as reopened when a new event reopens a resolved issue" do
+    crash = fn -> exit(:badarith) end
+
+    capture_log(fn -> in_unlinked_process(crash) end)
+
+    assert_receive({:email, first_email}, 1_000)
+    refute first_email.text_body =~ "This event reopened a previously resolved issue."
+
+    [event] = TowerWeb.DB.Events.list_events()
+    issue = TowerWeb.DB.Issues.get_issue(event.issue_id)
+    {:ok, _issue} = TowerWeb.DB.Issues.update_issue(issue, %{state: :resolved})
+
+    capture_log(fn -> in_unlinked_process(crash) end)
+
+    assert_receive({:email, second_email}, 1_000)
+    assert second_email.text_body =~ "This event reopened a previously resolved issue."
+  end
+
   defp in_unlinked_process(fun) when is_function(fun, 0) do
     {:ok, pid} = Task.Supervisor.start_link()
 
